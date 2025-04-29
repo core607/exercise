@@ -59,8 +59,11 @@ public class WordSplitServiceImpl implements WordSplitService {
 
     private Set<String> createDictionary(WordSplitDTO wordSplitDTO) {
         return switch (wordSplitDTO.getDictionaryType()) {
+            // get from repository
             case DEFAULT_DICTIONARY -> repository.getDictonary();
+            // get from user upload
             case CUSTOM_DICTIONARY -> wordSplitDTO.getCustomDictionary();
+            // combine both dictionary
             case COMBINE_DICTIONARY -> Stream.concat(repository.getDictonary().stream(),
                     wordSplitDTO.getCustomDictionary().stream()).collect(Collectors.toSet());
         };

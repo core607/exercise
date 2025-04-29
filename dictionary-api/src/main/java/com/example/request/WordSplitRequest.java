@@ -13,7 +13,21 @@ import java.util.Set;
 @NoArgsConstructor
 @Builder
 public class WordSplitRequest {
+    /**
+     * Input sentence to be split into words
+     * Example: "ilikesamsungmobile"
+     */
     private String sentence;
+
+    /**
+     * Custom dictionary words provided by the user
+     * Only used when dictionaryType is CUSTOM_DICTIONARY or COMBINE
+     */
     private Set<String> customDictionary;
+
+    /**
+     * Type of dictionary to use for word splitting
+     * @see DictionaryType
+     */
     private DictionaryType dictionaryType;
 }
