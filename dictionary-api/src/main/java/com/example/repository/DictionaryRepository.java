@@ -1,6 +1,5 @@
 package com.example.repository;
 
-import com.example.request.WordSplitRequest;
 import org.springframework.stereotype.Repository;
 
 import java.util.Set;
