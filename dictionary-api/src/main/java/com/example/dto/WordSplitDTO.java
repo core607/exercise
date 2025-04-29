@@ -1,4 +1,4 @@
-package com.example.request;
+package com.example.dto;
 
 import com.example.enums.DictionaryType;
 import lombok.AllArgsConstructor;
@@ -12,7 +12,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class WordSplitRequest {
+public class WordSplitDTO {
     private String sentence;
     private Set<String> customDictionary;
     private DictionaryType dictionaryType;

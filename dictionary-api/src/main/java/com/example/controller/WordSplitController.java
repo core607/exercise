@@ -1,5 +1,6 @@
 package com.example.controller;
 
+import com.example.mapping.WordSplitMapping;
 import com.example.request.WordSplitRequest;
 import com.example.response.WordSplitResponse;
 import com.example.service.WordSplitService;
@@ -18,6 +19,8 @@ import java.util.List;
 public class WordSplitController {
 
     private final WordSplitService wordSplitService;
+    private final WordSplitMapping wordSplitMapping;
+
 
     /**
      * Split sentence into words using dictionary
@@ -27,7 +30,7 @@ public class WordSplitController {
      */
     @PostMapping("/v1/word-split")
 	public ResponseEntity<WordSplitResponse> wordSplit(@RequestBody WordSplitRequest request) {
-        List<String> results = wordSplitService.wordSplit(request.getSentence());
+        List<String> results = wordSplitService.wordSplit(wordSplitMapping.toDTO(request));
         return ResponseEntity.ok(WordSplitResponse.builder().results(results).build());
     }
 

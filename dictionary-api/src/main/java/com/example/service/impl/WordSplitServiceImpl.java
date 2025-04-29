@@ -1,16 +1,17 @@
 package com.example.service.impl;
 
 
+import com.example.dto.WordSplitDTO;
+import com.example.enums.DictionaryType;
 import com.example.repository.DictionaryRepository;
 import com.example.service.WordSplitService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Word Split Service Implementation
@@ -26,19 +27,38 @@ public class WordSplitServiceImpl implements WordSplitService {
     /**
      * Split sentence into words using dictionary
      *
-     * @param sentence user inputted sentence
+     * @param wordSplitDTO user inputted sentence and customized dictionary
      * @return all possible word
      */
     @Override
-    public List<String> wordSplit(String sentence) {
+    public List<String> wordSplit(WordSplitDTO wordSplitDTO) {
         // Validate input
-        if (!StringUtils.hasLength(sentence)) {
-            log.warn("Invalid input: sentence is null or empty. sentence: {}", sentence); // 基础版
+        validateDto(wordSplitDTO);
+        Set<String> dictionary = createDictionary(wordSplitDTO);
+        return splitAlgorithm(wordSplitDTO.getSentence(), dictionary);
+    }
+
+    private void validateDto(WordSplitDTO wordSplitDTO) {
+        if (!StringUtils.hasLength(wordSplitDTO.getSentence())) {
+            log.error("Invalid input: sentence is null or empty. wordSplitDTO: {}", wordSplitDTO);
             throw new IllegalArgumentException("Input sentence cannot be null or empty");
         }
-        // Get dictionary from repository(fake code)
-        Set<String> dictionary = repository.getDictonary();
-        return splitAlgorithm(sentence, dictionary);
+        if (wordSplitDTO.getDictionaryType() == null) {
+            log.error("DictionaryType is null. wordSplitDTO: {}", wordSplitDTO);
+            throw new IllegalArgumentException("DictionaryType cannot be null");
+        }
+        if (wordSplitDTO.getDictionaryType().equals(DictionaryType.CUSTOM_DICTIONARY) &&
+                CollectionUtils.isEmpty(wordSplitDTO.getCustomDictionary())){
+            log.error("Invalid input: customDictionary is null or empty. wordSplitDTO: {}", wordSplitDTO);
+            throw new IllegalArgumentException("Invalid input: customDictionary is null or empty.");
+        }
+    }
+
+    private Set<String> createDictionary(WordSplitDTO wordSplitDTO) {
+        return switch (wordSplitDTO.getDictionaryType()) {
+            case DEFAULT_DICTIONARY -> repository.getDictonary();
+            case CUSTOM_DICTIONARY -> wordSplitDTO.getCustomDictionary();
+        };
     }
 
 
