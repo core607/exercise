@@ -109,4 +109,30 @@ class WordSplitServiceImplTests {
                 () -> assertTrue(results.contains("ilikesamsungmo bile"))
         );
     }
+
+    @Test
+    void createDictionary_ShouldReturnCombineDictionary_WhenTypeIsCustom() {
+        when(repository.getDictonary()).thenReturn(mockDictionary);
+        Set<String> customDict = Set.of("ilikesamsungmo", "bile");
+        WordSplitDTO input = new WordSplitDTO("ilikesamsungmobile", customDict, DictionaryType.COMBINE_DICTIONARY);
+
+        List<String> results = wordSplitService.wordSplit(input);
+
+        assertAll(
+                () -> assertEquals(3, results.size()),
+                () -> assertTrue(results.contains("ilikesamsungmo bile")),
+                () -> assertTrue(results.contains("i like sam sung mobile")),
+                () -> assertTrue(results.contains("i like samsung mobile"))
+        );
+    }
+
+    @Test
+    void wordSplit_ShouldThrowException_WhenCombineDictionaryIsEmpty() {
+        WordSplitDTO input = new WordSplitDTO("test", null, DictionaryType.COMBINE_DICTIONARY);
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> wordSplitService.wordSplit(input));
+
+        assertEquals("Invalid input: customDictionary is null or empty.", exception.getMessage());
+    }
 }

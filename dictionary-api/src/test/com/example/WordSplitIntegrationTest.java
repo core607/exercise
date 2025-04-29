@@ -7,6 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -51,6 +52,30 @@ public class WordSplitIntegrationTest {
                 .andExpect(jsonPath("$.results").isArray())
                 .andExpect(jsonPath("$.results.length()").value(1))
                 .andExpect(jsonPath("$.results[0]").value("ilikesam sungmobile"));
+    }
+    @Test
+    void shouldReturnValidWordBreaksWithCombineDictionary() throws Exception {
+        mockMvc.perform(post("/api/v1/word-split")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                    {
+                        "sentence": "ilikesamsungmobile",
+                        "dictionaryType": "combine",
+                        "customDictionary": ["ilikesam", "sungmobile"]
+                    }
+                    """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.results").isArray())
+                .andExpect(jsonPath("$.results.length()").value(5))
+                .andExpect(jsonPath("$.results").value(
+                        containsInAnyOrder(
+                                "i like sam sung mobile",
+                                "i like samsung mobile",
+                                "ilikesam sungmobile",
+                                "i like sam sungmobile",
+                                "ilikesam sung mobile"
+                        )
+                ));
     }
 
     @Test

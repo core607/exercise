@@ -12,6 +12,8 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Word Split Service Implementation
@@ -47,7 +49,8 @@ public class WordSplitServiceImpl implements WordSplitService {
             log.error("DictionaryType is null. wordSplitDTO: {}", wordSplitDTO);
             throw new IllegalArgumentException("DictionaryType cannot be null");
         }
-        if (wordSplitDTO.getDictionaryType().equals(DictionaryType.CUSTOM_DICTIONARY) &&
+        if ((wordSplitDTO.getDictionaryType().equals(DictionaryType.CUSTOM_DICTIONARY)
+                || wordSplitDTO.getDictionaryType().equals(DictionaryType.COMBINE_DICTIONARY)) &&
                 CollectionUtils.isEmpty(wordSplitDTO.getCustomDictionary())){
             log.error("Invalid input: customDictionary is null or empty. wordSplitDTO: {}", wordSplitDTO);
             throw new IllegalArgumentException("Invalid input: customDictionary is null or empty.");
@@ -58,6 +61,8 @@ public class WordSplitServiceImpl implements WordSplitService {
         return switch (wordSplitDTO.getDictionaryType()) {
             case DEFAULT_DICTIONARY -> repository.getDictonary();
             case CUSTOM_DICTIONARY -> wordSplitDTO.getCustomDictionary();
+            case COMBINE_DICTIONARY -> Stream.concat(repository.getDictonary().stream(),
+                    wordSplitDTO.getCustomDictionary().stream()).collect(Collectors.toSet());
         };
     }
 
